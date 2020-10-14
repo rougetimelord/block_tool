@@ -57,7 +57,6 @@ while cursor != 0:
     cursor = block_list_resp[1][1]
 
 block_list_ids = block_list_ids[0]
-print(block_list_ids)
 
 print("blocking %i accounts on %s" % (len(block_list_ids), import_name))
 for acct_id in block_list_ids:
