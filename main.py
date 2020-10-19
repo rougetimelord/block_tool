@@ -60,9 +60,9 @@ while cursor != 0:
     cursor = block_list_resp[1][1]
 
 print("blocking %i accounts on %s" % (len(block_list), import_name))
-for acct in block_list:
+for index, acct in enumerate(block_list):
     try:
-        print("blocking %s" % (acct['name']))
+        print("%04d blocking %s" % (index + 1, acct['name']))
         import_api.create_block(user_id=acct['id'])
     except tweepy.TweepError as e:
         print(e)
