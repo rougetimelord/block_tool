@@ -50,17 +50,19 @@ import_name = input("import name: ")
 import_api = connect(import_name)
 
 cursor = -1
-block_list_ids = []
+block_list = []
 while cursor != 0:
-    block_list_resp = export_api.blocks_ids(cursor)
-    block_list_ids.append(block_list_resp[0])
+    block_list_resp = export_api.blocks(cursor)
+    for user in block_list_resp[0]:
+        block_list.append({
+            'name': user.screen_name,
+            'id': user.id})
     cursor = block_list_resp[1][1]
 
-block_list_ids = block_list_ids[0]
-
-print("blocking %i accounts on %s" % (len(block_list_ids), import_name))
-for acct_id in block_list_ids:
+print("blocking %i accounts on %s" % (len(block_list), import_name))
+for acct in block_list:
     try:
-        import_api.create_block(user_id=acct_id)
+        print("blocking %s" % (acct['name']))
+        import_api.create_block(user_id=acct['id'])
     except tweepy.TweepError as e:
         print(e)
