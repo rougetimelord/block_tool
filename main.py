@@ -3,12 +3,16 @@ import json
 
 
 def connect(name):
-    auth = tweepy.OAuthHandler(key["con_t"], key["con_s"], "https://auth.r0uge.org")
+    # Either change the callback URL to one under your control, or add "https://auth.r0uge.org" to your app's callback URL list. Failing to do either will break this app, any issues related to this will be immediately closed and I will bully you.
+    auth = tweepy.OAuthHandler(
+        key["con_t"], key["con_s"], "https://auth.r0uge.org"
+    )
 
     if name in key["account_keys"]:
         print("got cached key for %s" % name)
         auth.set_access_token(
-            key["account_keys"][name]["acc_t"], key["account_keys"][name]["acc_ts"]
+            key["account_keys"][name]["acc_t"],
+            key["account_keys"][name]["acc_ts"],
         )
     else:
         print("setting up key for %s" % name)
