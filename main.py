@@ -3,7 +3,10 @@ import json
 
 
 def connect(name):
-    # Either change the callback URL to one under your control, or add "https://auth.r0uge.org" to your app's callback URL list. Failing to do either will break this app, any issues related to this will be immediately closed and I will bully you.
+    # Either change the callback URL to one under your control, or add
+    # "https://auth.r0uge.org" to your app's callback URL list. Failing to do
+    # either will break this app, any issues related to this will be
+    # immediately closed and I will bully you.
     auth = tweepy.OAuthHandler(
         key["con_t"], key["con_s"], "https://auth.r0uge.org"
     )
