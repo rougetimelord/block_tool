@@ -44,7 +44,7 @@ try:
 except IOError:
     exit()
 
-export_name = input("import name: ")
+export_name = input("export name: ")
 export_api = connect(export_name)
 import_name = input("import name: ")
 import_api = connect(import_name)
