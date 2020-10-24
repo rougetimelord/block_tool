@@ -63,6 +63,6 @@ print("blocking %i accounts on %s" % (len(block_list), import_name))
 for index, acct in enumerate(block_list):
     try:
         print("%04i blocking %s" % (index + 1, acct['name']))
-        import_api.create_block(user_id=acct['id'])
+        import_api.create_block(user_id=acct['id'], skip_status=True, include_entities=False)
     except tweepy.TweepError as e:
         print(e)
