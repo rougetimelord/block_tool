@@ -131,7 +131,7 @@ def getBlocks(userID):
         for entry in block_list
         if entry not in userData["block_list"]
     ]
-    userData["block_list"] = filterBlockList(userData["block_list"])
+    # userData["block_list"] = filterBlockList(userData["block_list"])
     updateBlocks(userID, userData)
     return
 
