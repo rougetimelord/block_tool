@@ -2,6 +2,7 @@ import json
 import tweepy
 import os.path
 from tweepy import cursor
+from time import sleep
 
 from tweepy.error import TweepError
 
@@ -80,6 +81,29 @@ def updateBlocks(userID, userData):
     return
 
 
+def filterBlockList(block_list):
+    res = []
+    print("filtering blocks")
+    for acct in block_list:
+        try:
+            app_api.get_user(user_id=acct["id"])
+            res.append(acct)
+        except tweepy.TweepError as e:
+            if e.api_code == 50 or e.api_code == 63:
+                continue
+            elif e.response.status_code == 429:
+                res.append(acct)
+                print("waiting out get user")
+                sleep(300)
+                continue
+            else:
+                print(e)
+                res.append(acct)
+                continue
+    print("returning %i blocks" % len(res))
+    return res
+
+
 def getBlocks(userID):
     with open(fileName(userID), "r") as f:
         userData = json.load(f)
@@ -94,14 +118,20 @@ def getBlocks(userID):
             cursor = block_list_resp[1][1]
             last_cur = block_list_resp[1][0]
         except tweepy.TweepError as e:
-            print(e)
-            break
+            if e.response.status_code == 429:
+                print("waiting out get blocks")
+                sleep(300)
+                continue
+            else:
+                print(e.reason)
+                break
     userData["last_cursor"] = last_cur
     [
         userData["block_list"].append(entry)
         for entry in block_list
         if entry not in userData["block_list"]
     ]
+    userData["block_list"] = filterBlockList(userData["block_list"])
     updateBlocks(userID, userData)
     return
 
