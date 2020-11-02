@@ -107,8 +107,7 @@ def filterBlockList(block_list):
 def getBlocks(userID):
     with open(fileName(userID), "r") as f:
         userData = json.load(f)
-    cursor = userData["last_cursor"]
-    last_cur = -1
+    cursor = -1
     block_list = []
     while cursor != 0:
         try:
@@ -116,7 +115,6 @@ def getBlocks(userID):
             for user in block_list_resp[0]:
                 block_list.append({"name": user.screen_name, "id": user.id})
             cursor = block_list_resp[1][1]
-            last_cur = block_list_resp[1][0]
         except tweepy.TweepError as e:
             if e.response.status_code == 429:
                 print("waiting out get blocks")
@@ -125,7 +123,6 @@ def getBlocks(userID):
             else:
                 print(e.reason)
                 break
-    userData["last_cursor"] = last_cur
     [
         userData["block_list"].append(entry)
         for entry in block_list
