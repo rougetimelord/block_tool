@@ -1,4 +1,4 @@
-import json
+import json, sys
 import tweepy
 import os.path
 from tweepy import cursor
@@ -152,7 +152,8 @@ def createBlocks(userID, blockList):
 export_user = input("export username: ")
 connect(export_user)
 export_id = getID(export_user)
-getBlocks(export_id)
+if "-sb" not in sys.argv:
+    getBlocks(export_id)
 
 import_user = input("import username: ")
 connect(import_user)
