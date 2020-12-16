@@ -3,7 +3,6 @@ import tweepy
 import os.path
 from tweepy import cursor
 from time import sleep
-
 from tweepy.error import TweepError
 
 try:
@@ -81,26 +80,31 @@ def updateBlocks(userID, userData):
     return
 
 
-def filterBlockList(block_list):
+def filterRunner(username):
+    driver.get(base + username)
+    # Wait for the page to render
+    sleep(0.5)
+
+    # Debug print statement
+    # print(driver.title, username, sep="::")
+
+    if driver.title == "Profile / Twitter":
+        return True
+    return False
+
+
+def filterBlockList(userID):
+    with open(fileName(userID), "r") as f:
+        userData = json.load(f)
+
     res = []
     print("filtering blocks")
-    for acct in block_list:
-        try:
-            app_api.get_user(user_id=acct["id"])
+    for acct in userData["block_list"]:
+        if not filterRunner(acct["name"]):
             res.append(acct)
-        except tweepy.TweepError as e:
-            if e.api_code == 50 or e.api_code == 63:
-                continue
-            elif e.response.status_code == 429:
-                res.append(acct)
-                print("waiting out get user")
-                sleep(300)
-                continue
-            else:
-                print(e)
-                res.append(acct)
-                continue
+    userData["block_list"] = res
     print("returning %i blocks" % len(res))
+    updateBlocks(userID, userData)
     return res
 
 
@@ -128,8 +132,6 @@ def getBlocks(userID):
         for entry in block_list
         if entry not in userData["block_list"]
     ]
-    if "-filter" in sys.argv:
-        userData["block_list"] = filterBlockList(userData["block_list"])
     updateBlocks(userID, userData)
     return
 
@@ -153,8 +155,17 @@ def createBlocks(userID, blockList):
 export_user = input("export username: ")
 connect(export_user)
 export_id = getID(export_user)
+
 if "-sb" not in sys.argv:
     getBlocks(export_id)
+
+if "-filter" in sys.argv:
+    from selenium import webdriver
+
+    driver = webdriver.Chrome()
+    base = "https://twitter.com/"
+    filterBlockList(export_id)
+    driver.close()
 
 import_user = input("import username: ")
 connect(import_user)
