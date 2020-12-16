@@ -80,17 +80,69 @@ def updateBlocks(userID, userData):
     return
 
 
-def filterRunner(username):
+def filterRunnerAPI(username):
+    # Keep track of how many method switches have happened in a row,
+    # if either method works this gets reset.
+    global switchCounter
+
+    try:
+        app_api.get_user(screen_name=username)
+        switchCounter = 0
+        return [0, True]
+    except tweepy.TweepError as e:
+        if e.api_code == 50 or e.api_code == 63:
+            switchCounter = 0
+            return [1, True]
+
+        elif e.response.status_code == 429:
+            print("Switching method to Selenium")
+
+            switchCounter += 1
+            # If there are succesive switches just wait a bit
+            if switchCounter >= 3:
+                print("Waiting 5 minutes to switch")
+                sleep(300)
+
+            res = filterRunnerSelenium(username)
+            res[1] = False
+            return res
+        else:
+            print(e)
+            return [0, True]
+
+
+def filterRunnerSelenium(username):
+    # Keep track of how many method switches have happened in a row,
+    # if either method works this gets reset.
+    global switchCounter
+
     driver.get(base + username)
     # Wait for the page to render
     sleep(0.5)
 
+    try:
+        elem = driver.find_element_by_css_selector(
+            "div.css-1dbjc4n.r-15d164r.r-1g94qm0 > div > div > div.css-1dbjc4n.r-1awozwy.r-18u37iz.r-dnmrzs > div > span > span"
+        )
+    except NoSuchElementException:
+        print("Switching method to API")
+
+        # If there are succesive switches just wait a bit
+        switchCounter += 1
+        if switchCounter >= 3:
+            print("Waiting 5 minutes to switch")
+            sleep(300)
+
+        res = filterRunnerAPI(username)
+        res[1] = False
+        return res
+
     # Debug print statement
     # print(driver.title, username, sep="::")
-
+    switchCounter = 0
     if driver.title == "Profile / Twitter":
-        return True
-    return False
+        return [1, True]
+    return [0, True]
 
 
 def filterBlockList(userID):
@@ -99,9 +151,24 @@ def filterBlockList(userID):
 
     res = []
     print("filtering blocks")
+    filterMethod = 1  # 0: Selenium, 1: API
+    # The API method is much faster than the slenium based
+
     for acct in userData["block_list"]:
-        if not filterRunner(acct["name"]):
-            res.append(acct)
+        if filterMethod == 0:
+            filterResult = filterRunnerSelenium(acct["name"])
+            if filterResult[0] == 0:
+                res.append(acct)
+            if not filterResult[1]:
+                filterMethod = 1
+
+        elif filterMethod == 1:
+            filterResult = filterRunnerAPI(acct["name"])
+            if filterResult[0] == 0:
+                res.append(acct)
+            if not filterResult[1]:
+                filterMethod = 0
+
     userData["block_list"] = res
     print("returning %i blocks" % len(res))
     updateBlocks(userID, userData)
@@ -161,7 +228,9 @@ if "-sb" not in sys.argv:
 
 if "-filter" in sys.argv:
     from selenium import webdriver
+    from selenium.common.exceptions import NoSuchElementException
 
+    switchCounter = 0
     driver = webdriver.Chrome()
     base = "https://twitter.com/"
     filterBlockList(export_id)
