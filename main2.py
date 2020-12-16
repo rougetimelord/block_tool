@@ -5,6 +5,7 @@ from tweepy import cursor
 from time import sleep
 from tweepy.error import TweepError
 
+# Load up keys
 try:
     with open("key.json", "r") as f:
         app_key = json.load(f)
@@ -12,6 +13,7 @@ try:
             consumer_key=app_key["con_t"], consumer_secret=app_key["con_s"]
         )
         app_api = tweepy.API(_)
+        # Start API instance cache and username to user id cache
         userAPIs = {}
         nameIDs = {}
         print("loaded app keys")
@@ -21,10 +23,25 @@ except IOError:
 
 
 def fileName(userID):
+    """Generates the JSON filename from a user's ID.
+
+    Args:
+        userID (int): The user's ID
+
+    Returns:
+        str: The filename for the user's data.
+    """
     return "%s_data.json" % userID
 
 
 def onboard(userID, acc_t, acc_ts):
+    """Initializes the data file for a user
+
+    Args:
+        userID (int): The user's ID.
+        acc_t (str): The user's access token.
+        acc_ts (str): The user's access secret.
+    """
     data = {
         "acc_t": acc_t,
         "acc_ts": acc_ts,
@@ -37,12 +54,25 @@ def onboard(userID, acc_t, acc_ts):
 
 
 def getID(username):
+    """Gets the user's id out of the the username to ID cache.
+
+    Args:
+        username (str): The user's username.
+
+    Returns:
+        int: The user's ID.
+    """
     if username in nameIDs:
         return nameIDs[username]
     return None
 
 
 def connect(username):
+    """Creates a user's API instance.
+
+    Args:
+        username (str): The user's username.
+    """
     userID = app_api.get_user(screen_name=username).id
     auth = tweepy.OAuthHandler(
         consumer_key=app_key["con_t"],
@@ -75,12 +105,26 @@ def connect(username):
 
 
 def updateBlocks(userID, userData):
+    """Dumps a user's data to disk.
+
+    Args:
+        userID (int): The user's ID.
+        userData (dict): The in memory version of the user's data.
+    """
     with open(fileName(userID), "w") as f:
         json.dump(userData, f)
     return
 
 
 def filterRunnerAPI(username):
+    """Filters through accounts using the twitter API.
+
+    Args:
+        username (str): The user's username.
+
+    Returns:
+        list: First entry is 0 for an existing user, 1 for a defunct user. Second entry determines whether the method of scraping has to change.
+    """
     # Keep track of how many method switches have happened in a row,
     # if either method works this gets reset.
     global switchCounter
@@ -112,6 +156,14 @@ def filterRunnerAPI(username):
 
 
 def filterRunnerSelenium(username):
+    """Filters through accounts using Selenium.
+
+    Args:
+        username (str): The user's username.
+
+    Returns:
+        list: First entry is 0 for an existing user, 1 for a defunct user. Second entry determines whether the method of scraping has to change.
+    """
     # Keep track of how many method switches have happened in a row,
     # if either method works this gets reset.
     global switchCounter
@@ -146,6 +198,11 @@ def filterRunnerSelenium(username):
 
 
 def filterBlockList(userID):
+    """Filters the block list of a user.
+
+    Args:
+        userID (int): The user who's block list should be filtered
+    """
     with open(fileName(userID), "r") as f:
         userData = json.load(f)
 
@@ -172,10 +229,15 @@ def filterBlockList(userID):
     userData["block_list"] = res
     print("returning %i blocks" % len(res))
     updateBlocks(userID, userData)
-    return res
+    return
 
 
 def getBlocks(userID):
+    """Gets a user's block list from the twitter API.
+
+    Args:
+        userID (int): The user's ID.
+    """
     with open(fileName(userID), "r") as f:
         userData = json.load(f)
     cursor = -1
@@ -204,11 +266,25 @@ def getBlocks(userID):
 
 
 def getBlockList(userID):
+    """Gets the block_list of a user from disk
+
+    Args:
+        userID (int): The user's ID.
+
+    Returns:
+        list: A list of dicts that include blocked user's username and ID.
+    """
     with open(fileName(userID), "r") as f:
         return json.load(f)["block_list"]
 
 
 def createBlocks(userID, blockList):
+    """Creates a blocks on the user's account.
+
+    Args:
+        userID (int): The user's ID.
+        blockList (list): A list of dicts that include the username and IDs of accounts to block
+    """
     for acct in blockList:
         try:
             userAPIs[userID].create_block(
