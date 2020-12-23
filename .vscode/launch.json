@@ -20,14 +20,6 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": ["-sb"]
-        },
-        {
-            "name": "Python: Current File Skip Filter",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "args": ["-filter", "-sb"]
         }
     ]
 }
