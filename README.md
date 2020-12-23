@@ -6,7 +6,6 @@ This tool is heavily experimental, it is not feature rich and is not suitable fo
 
 ## Options
 - -sb: skips getting blocks if the most recent block list get is not stale
-- -filter: filters out any defunct (suspended or deleted accounts), requires selenium to be installed and takes a while to complete
 
 ## Future plans
 Eventually I will make a node.js port/webapp to accomplish this. At that point this will lose support.
