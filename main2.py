@@ -19,7 +19,7 @@ except IOError:
     exit()
 
 
-def fileName(userID):
+def fileName(userID) -> str:
     """Generates the JSON filename from a user's ID.
 
     Args:
@@ -31,7 +31,7 @@ def fileName(userID):
     return "%s_data.json" % userID
 
 
-def onboard(userID, acc_t, acc_ts):
+def onboard(userID, acc_t, acc_ts) -> None:
     """Initializes the data file for a user
 
     Args:
@@ -48,7 +48,7 @@ def onboard(userID, acc_t, acc_ts):
     return
 
 
-def getID(username):
+def getID(username) -> int:
     """Gets the user's id out of the the username to ID cache.
 
     Args:
@@ -60,7 +60,7 @@ def getID(username):
     return nameIDs[username] if username in nameIDs else None
 
 
-def connect(username):
+def connect(username) -> None:
     """Creates a user's API instance.
 
     Args:
@@ -96,7 +96,7 @@ def connect(username):
     return
 
 
-def updateUserData(userID, userData):
+def updateUserData(userID, userData) -> None:
     """Dumps a user's data to disk.
 
     Args:
@@ -108,7 +108,7 @@ def updateUserData(userID, userData):
     return
 
 
-def getUserData(userID):
+def getUserData(userID) -> dict:
     """Gets a user's data from either disk or the cache.
 
     Args:
@@ -126,7 +126,7 @@ def getUserData(userID):
         return userData
 
 
-def getBlocks(userID):
+def getBlocks(userID) -> None:
     """Gets a user's block list from the twitter API.
 
     Args:
@@ -158,7 +158,7 @@ def getBlocks(userID):
     return
 
 
-def getBlockList(userID):
+def getBlockList(userID) -> list:
     """Gets the block_list of a user from disk
 
     Args:
@@ -170,7 +170,7 @@ def getBlockList(userID):
     return getUserData(userID)["block_list"]
 
 
-def createBlocks(userID, blockList, exportID=0):
+def createBlocks(userID, blockList, exportID=0) -> None:
     """Creates a blocks on the user's account.
 
     Args:
