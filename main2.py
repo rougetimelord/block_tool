@@ -209,7 +209,15 @@ export_id = getID(export_user)
 if "-sb" not in sys.argv:
     getBlocks(export_id)
 
-import_user = input("import username: ")
-connect(import_user)
-import_id = getID(import_user)
-createBlocks(import_id, getBlockList(export_id), exportID=export_id)
+if "-g" in sys.argv:
+    imports = input("comma seperated list: ")
+    importList = "".join(imports.split()).split(",")
+    for name in importList:
+        connect(name)
+        id = getID(name)
+        createBlocks(id, getBlockList(export_id), exportID=export_id)
+else:
+    import_user = input("import username: ")
+    connect(import_user)
+    import_id = getID(import_user)
+    createBlocks(import_id, getBlockList(export_id), exportID=export_id)
