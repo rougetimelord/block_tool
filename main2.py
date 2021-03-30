@@ -202,22 +202,27 @@ def createBlocks(userID, blockList, exportID=0) -> None:
     return
 
 
-export_user = input("export username: ")
-connect(export_user)
-export_id = getID(export_user)
+def go():
+    export_user = input("export username: ")
+    connect(export_user)
+    export_id = getID(export_user)
 
-if "-sb" not in sys.argv:
-    getBlocks(export_id)
+    if "-sb" not in sys.argv:
+        getBlocks(export_id)
 
-if "-g" in sys.argv:
-    imports = input("comma seperated list: ")
-    importList = "".join(imports.split()).split(",")
-    for name in importList:
-        connect(name)
-        id = getID(name)
-        createBlocks(id, getBlockList(export_id), exportID=export_id)
-else:
-    import_user = input("import username: ")
-    connect(import_user)
-    import_id = getID(import_user)
-    createBlocks(import_id, getBlockList(export_id), exportID=export_id)
+    if "-g" in sys.argv:
+        imports = input("comma seperated list: ")
+        importList = "".join(imports.split()).split(",")
+        for name in importList:
+            connect(name)
+            id = getID(name)
+            createBlocks(id, getBlockList(export_id), exportID=export_id)
+    else:
+        import_user = input("import username: ")
+        connect(import_user)
+        import_id = getID(import_user)
+        createBlocks(import_id, getBlockList(export_id), exportID=export_id)
+
+
+if __name__ == "__main__":
+    go()
