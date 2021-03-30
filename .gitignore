@@ -1,3 +1,4 @@
 key.json
 **/*_data.json
 **/debug.log
+**/*.pyc
