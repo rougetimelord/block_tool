@@ -196,7 +196,7 @@ def createBlocks(userID, blockList, exportID=0) -> None:
                 )
                 filteredList.append(acct)
     if not exportID == 0:
-        exportData = getUserData(export_id)
+        exportData = getUserData(exportID)
         exportData["block_list"] = filteredList
         updateUserData(exportID, exportData)
     return
