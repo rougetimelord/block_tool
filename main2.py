@@ -187,7 +187,8 @@ def createBlocks(userID, blockList, exportID=0) -> None:
             filteredList.append(acct)
         except tweepy.TweepError as e:
             if e.api_code == 50 or e.api_code == 63:
-                print(acct["name"], e, sep=": ")
+                if "name" in acct.keys():
+                    print(acct["name"], e, sep=": ")
             elif e.response.status_code == 429:
                 print("Waiting out blocking")
                 sleep(900)
